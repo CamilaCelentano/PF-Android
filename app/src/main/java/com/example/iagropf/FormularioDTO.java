@@ -17,9 +17,9 @@ public class FormularioDTO {
 
     @SerializedName("formulario")
 
-    @Expose
+    @Expose(serialize = true)
     public transient int idFormulario;
-    @Expose
+    @Expose(serialize = false)
     public String nombre;
     @Expose
     public String resumen;
@@ -42,10 +42,11 @@ public class FormularioDTO {
 
     @Override
     public String toString() {
-        return "nombre= " + nombre + "\r" ;
+        return nombre + "\r" ;
     }
 
     public FormularioDTO(String nombre, String resumen) {
+        super();
         this.nombre = nombre;
         this.resumen = resumen;
     }
@@ -53,4 +54,17 @@ public class FormularioDTO {
     public FormularioDTO(String nombre) {
         this.nombre = nombre;
     }
+
+    public FormularioDTO(int idFormulario){
+        super();
+        this.idFormulario = idFormulario;
+    }
+
+    public FormularioDTO(int idFormulario, String nombre) {
+        super();
+        this.idFormulario = idFormulario;
+        this.nombre = nombre;
+    }
+
+
 }

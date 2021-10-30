@@ -26,7 +26,6 @@ public class Formularios extends AppCompatActivity {
 
     ListView listado;
     ArrayAdapter ADP;
-    ArrayList<FormularioDTO> lista = new ArrayList<FormularioDTO>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +35,6 @@ public class Formularios extends AppCompatActivity {
         getSupportActionBar().setIcon(R.mipmap.ic_launcher_logo_round);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         listado = (ListView) findViewById(R.id.LisFormulario);
-        ADP = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, lista);
-        listado.setAdapter(ADP);
         traerListado();
         eventoClickFormularios();
     }
@@ -74,14 +71,12 @@ public class Formularios extends AppCompatActivity {
                 JSONArray jsonAsObj = new JSONArray(jsonResult);
                 ObjectMapper mapper = new ObjectMapper();
                 List<FormularioDTO> forms = mapper.readValue(jsonAsObj.toString(), new TypeReference<List<FormularioDTO>>(){});
-                for (FormularioDTO form : forms) {
-                    System.out.println(form);
-                    lista.add(form);
-                    ADP.notifyDataSetChanged();
-                }
 
-
+                ADP = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, forms);
+                ADP.notifyDataSetChanged();
+                listado.setAdapter(ADP);
             }
+
         } catch (IOException | JSONException e) {
             Log.d("STATE",e.getMessage());
             Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
@@ -92,9 +87,14 @@ public class Formularios extends AppCompatActivity {
     public void eventoClickFormularios(){
         listado.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(Formularios.this,"pepe" + ADP.getItem(position), Toast.LENGTH_LONG).show();
+            public void onItemClick(AdapterView<?> parent, View view, int position, long idForm) {
 
+                FormularioDTO mm = (FormularioDTO) ADP.getItem(position);
+
+                Intent intent = new Intent(Formularios.this, ActividadCampo.class);
+                intent.putExtra("idFormulario", mm.getIdFormulario());
+
+                startActivity(intent);
             }
         });
     }
@@ -104,4 +104,8 @@ public class Formularios extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void btnElegir(View v){
+        Intent intent = new Intent(Formularios.this, ActividadCampo.class);
+        startActivity(intent);
+    }
 }
