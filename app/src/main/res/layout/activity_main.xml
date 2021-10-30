@@ -51,7 +51,6 @@
         android:ems="10"
         android:inputType="textPassword"
         android:minHeight="48dp"
-        android:text="admin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="SpeakableTextPresentCheck" />
