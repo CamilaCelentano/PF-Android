@@ -1,5 +1,6 @@
 package com.example.iagropf;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
@@ -37,9 +38,13 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.sql.Date;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import java.util.Date;
 import java.util.List;
 
 public class ActividadCampo extends AppCompatActivity  {
@@ -64,6 +69,11 @@ public class ActividadCampo extends AppCompatActivity  {
 
         fecha=(EditText) findViewById(R.id.etFecha);
         fecha.setInputType(InputType.TYPE_NULL);
+
+        String pattern = "dd-MM-yyyy";
+        DateFormat df = new SimpleDateFormat(pattern);
+        Date today = Calendar.getInstance().getTime();
+        fecha.setText(df.format(today));
 
         handlerOnClickSpinnerMetodoM();
         handlerOnClickSpinnerDpto();
@@ -118,7 +128,7 @@ public class ActividadCampo extends AppCompatActivity  {
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                                fecha.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
+                                fecha.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
                             }
                         }, year, month, day);
                 picker.show();
@@ -231,8 +241,6 @@ public class ActividadCampo extends AppCompatActivity  {
 
                 ArrayAdapter<MetodoMuestreoDTO> dataAdapter = new ArrayAdapter<MetodoMuestreoDTO>(ActividadCampo.this, android.R.layout.simple_spinner_dropdown_item,allNamesMet);
 
-              //  dataAdapter.setDropDownViewResource (android.R.layout.simple_spinner_dropdown_item);
-
                 metodoMuestreo.setAdapter(dataAdapter);
 
             }
@@ -299,7 +307,7 @@ public class ActividadCampo extends AppCompatActivity  {
             @Override
             public void onDateSet(DatePicker newFragment, int year, int month, int dayOfMonth) {
                 System.out.println(year);
-                selectedDate=dayOfMonth+"/"+month+1+"/"+year;
+                selectedDate=dayOfMonth+"-"+month+1+"-"+year;
                 fecha=(EditText)findViewById(R.id.etFecha);
                 Toast.makeText(ActividadCampo.this,selectedDate,Toast.LENGTH_SHORT).show();
                 fecha.setText(selectedDate);
@@ -336,6 +344,7 @@ public class ActividadCampo extends AppCompatActivity  {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void llamoalRest(View view){
     titulo = findViewById(R.id.textTitulo);
     descripcion = findViewById(R.id.multiLineDescripcion);
@@ -350,30 +359,28 @@ public class ActividadCampo extends AppCompatActivity  {
     String title = titulo.getText().toString().trim();
     String description =descripcion.getText().toString().trim();
     String quantity = cantidad.getText().toString().trim() == null ? "0" : cantidad.getText().toString().trim();
-    String date = fecha.getText().toString().trim();
+    String date = fecha.getText().toString();
 
 
-    DepartamentoDTO depa = new DepartamentoDTO(idDepartamentoSeleccionado,"");
-    MetodoMuestreoDTO muestreo = new MetodoMuestreoDTO(idMetodoMuestreoSeleccionado,"");
-    EstacionMuestreoDTO estam = new EstacionMuestreoDTO(idEstacionMuestreoSeleccionado,"");
+        //DepartamentoDTO depa = new DepartamentoDTO(idDepartamentoSeleccionado,"");
+   // MetodoMuestreoDTO muestreo = new MetodoMuestreoDTO(idMetodoMuestreoSeleccionado,"");
+   // EstacionMuestreoDTO estam = new EstacionMuestreoDTO(idEstacionMuestreoSeleccionado,"");
 
     Bundle extras = getIntent().getExtras();
     Integer id = extras.getInt("idFormulario");
 
-    FormularioDTO form = new FormularioDTO(id,"");
 
     //instancio objeto Java
-    //ActividadCampoDTO act = new ActividadCampoDTO(title,description, Date.valueOf(date),Integer.valueOf(quantity),id,idMetodoMuestreoSeleccionado,idEstacionMuestreoSeleccionado,idDepartamentoSeleccionado);
-    ActividadCampoDTO act = new ActividadCampoDTO();
-    act.setNombre(title);
-    act.setDescripcion(description);
-    act.setFecha(Date.valueOf(date));
-    act.setCantidad(Integer.valueOf(quantity));
-    act.setFormulario(form);
-    act.setMetMuestreo(muestreo);
-    act.setEstacionMuestreo(estam);
-    act.setDepartamento(depa);
 
+    ActividadCampoDTO act = new ActividadCampoDTO();
+        act.setCantidad(quantity);
+        act.setNombre(title);
+        act.setIdmetMuestreo(Long.valueOf(idMetodoMuestreoSeleccionado));
+        act.setIdestacionMuestreo(Long.valueOf(idEstacionMuestreoSeleccionado));
+        act.setIddepartamento(Long.valueOf(idDepartamentoSeleccionado));
+        act.setIdformulario(Long.valueOf(id));
+        act.setDescripcion(description);
+        act.setFecha(date);
 
     //Convierto objeto Java a JSON
     Gson gson = new GsonBuilder()
@@ -423,6 +430,10 @@ public class ActividadCampo extends AppCompatActivity  {
 
                 JsonElement jsonElement = new JsonParser().parse(jsonResult);
                 JsonObject jsonObject = jsonElement.getAsJsonObject();
+
+                descripcion.setText("");
+                titulo.setText("");
+                cantidad.setText("");
 
                 boolean error = jsonObject.get("error").getAsBoolean();
                 String mensaje = jsonObject.get("mensaje").toString();

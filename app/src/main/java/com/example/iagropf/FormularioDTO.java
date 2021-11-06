@@ -42,7 +42,9 @@ public class FormularioDTO {
 
     @Override
     public String toString() {
-        return nombre + "\r" ;
+        return
+
+                "Nombre= " + nombre  ;
     }
 
     public FormularioDTO(String nombre, String resumen) {

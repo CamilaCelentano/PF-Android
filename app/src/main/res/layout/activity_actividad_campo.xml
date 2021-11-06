@@ -55,7 +55,8 @@
             android:layout_marginTop="10dp"
             android:ems="10"
             android:hint="Titulo"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            tools:text="Jeffo" />
 
         <EditText
             android:id="@+id/multiLineDescripcion"
@@ -67,7 +68,8 @@
             android:gravity="start|top"
             android:hint="Descripcion"
             android:inputType="textMultiLine"
-            android:paddingLeft="10dp" />
+            android:paddingLeft="10dp"
+            tools:text="Se avivo" />
 
         <EditText
             android:id="@+id/eTNumberCantidad"
@@ -77,7 +79,8 @@
             android:layout_marginTop="10dp"
             android:ems="10"
             android:hint="Cantidad"
-            android:inputType="number" /><![CDATA[
+            android:inputType="number"
+            tools:text="2" /><![CDATA[
 
         android:onClick="showDatePickerDialog" />
 
@@ -93,7 +96,7 @@
             android:layout_marginTop="10dp"
             android:ems="10"
             android:focusable="false"
-            android:hint="DD/MM/YYYY"
+            android:hint="dd-MM-yyyy"
             android:inputType="date" />
 
         <Spinner

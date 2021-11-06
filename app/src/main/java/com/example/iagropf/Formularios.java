@@ -46,7 +46,7 @@ public class Formularios extends AppCompatActivity {
     Gson gson = new Gson();
     String jsonForm = gson.toJson(form);
 
-
+//traigo el listado de formularios y los meto en el arrayadapter
     public void traerListado() {
         URL url;
         HttpURLConnection urlConnection = null;
@@ -83,7 +83,7 @@ public class Formularios extends AppCompatActivity {
 
         }
     }
-
+//me llevo el id del formulario para la otra activity
     public void eventoClickFormularios(){
         listado.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
