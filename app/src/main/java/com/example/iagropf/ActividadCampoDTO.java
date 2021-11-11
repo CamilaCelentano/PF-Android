@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.google.gson.annotations.Expose;
 
 import java.util.Date;
+import java.util.List;
 
 public class ActividadCampoDTO {
 
@@ -30,6 +31,9 @@ public class ActividadCampoDTO {
     private String fecha;
     @Expose(serialize = true)
     private String cantidad;
+
+    @Expose(serialize = true)
+    private List<RespuestaCasillaDTO> respuestas;
     //private Usuario usuario;
     //@Expose(serialize = true)
     //private FormularioDTO formulario = new FormularioDTO();
@@ -65,7 +69,15 @@ public class ActividadCampoDTO {
     public void setCantidad(String cantidad) {
         this.cantidad = cantidad;
     }
-   /* public Usuario getUsuario() {
+
+    public List<RespuestaCasillaDTO> getRespuestas() {
+        return respuestas;
+    }
+
+    public void setRespuestas(List<RespuestaCasillaDTO> respuestas) {
+        this.respuestas = respuestas;
+    }
+    /* public Usuario getUsuario() {
         return usuario;
     }
     public void setUsuario(Usuario usuario) {

@@ -20,7 +20,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Formularios extends AppCompatActivity {
 
@@ -72,6 +74,8 @@ public class Formularios extends AppCompatActivity {
                 ObjectMapper mapper = new ObjectMapper();
                 List<FormularioDTO> forms = mapper.readValue(jsonAsObj.toString(), new TypeReference<List<FormularioDTO>>(){});
 
+                Map<String, Integer> map = new HashMap<String, Integer>();
+
                 ADP = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, forms);
                 ADP.notifyDataSetChanged();
                 listado.setAdapter(ADP);
@@ -104,8 +108,4 @@ public class Formularios extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void btnElegir(View v){
-        Intent intent = new Intent(Formularios.this, ActividadCampo.class);
-        startActivity(intent);
-    }
 }

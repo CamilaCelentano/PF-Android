@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -49,14 +50,18 @@ import java.util.List;
 
 public class ActividadCampo extends AppCompatActivity  {
     DatePickerDialog picker;
-    EditText titulo , descripcion , cantidad , fecha ;
+    EditText titulo , descripcion , cantidad , fecha, casillaDinamica ;
     Spinner departamento, estacionMuestreo , metodoMuestreo ;
+    LinearLayout linearLayoutAC;
     private String selectedDate;
     private DatePickerDialog.OnDateSetListener setListener;
 
     int idMetodoMuestreoSeleccionado;
     int idDepartamentoSeleccionado;
     int idEstacionMuestreoSeleccionado;
+    List<EditText> todosDinamicos = new ArrayList<EditText>();
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +71,7 @@ public class ActividadCampo extends AppCompatActivity  {
         traerListadoDeptos();
         traerListadoMetodos();
         traerListadoEstaciones();
+        traerCasillas();
 
         fecha=(EditText) findViewById(R.id.etFecha);
         fecha.setInputType(InputType.TYPE_NULL);
@@ -80,7 +86,6 @@ public class ActividadCampo extends AppCompatActivity  {
         handlerOnClickSpinnerEstacionM();
         handlerDataPickerFecha();
     }
-
     private void handlerOnClickSpinnerEstacionM() {
         estacionMuestreo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -152,6 +157,59 @@ public class ActividadCampo extends AppCompatActivity  {
             }
 
         });
+    }
+
+    public void traerCasillas() {
+        Bundle extras = getIntent().getExtras();
+        Integer id = extras.getInt("idFormulario");
+        URL url;
+        HttpURLConnection urlConnection = null;
+        try {
+            String urlServicio = "http://10.0.2.2:8080/WebIagro2/rest/formularios/formbyId/" + id;
+            url = new URL(urlServicio);
+
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestProperty("content-type", "application/json");
+            urlConnection.setRequestMethod("GET");
+            urlConnection.setReadTimeout(7500);
+            urlConnection.setConnectTimeout(7500);
+            urlConnection.setDoInput(true);
+            urlConnection.setDoOutput(false);
+
+            int respuesta = urlConnection.getResponseCode();
+
+            if (respuesta == HttpURLConnection.HTTP_OK) {
+                //Obtengo valores devueltos por Rest WS
+                BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String jsonResult = br.readLine();
+
+                JSONObject formulario = new JSONObject(jsonResult);
+
+                JSONArray casilla = formulario.getJSONArray("casilla");
+
+                for (int i=0; i<casilla.length(); i++) {
+                    JSONObject auxCasilla = casilla.getJSONObject(i);
+                    String nombreParametro = auxCasilla.getString("parametro");
+                    int idD = auxCasilla.getInt("idCasilla");
+
+                    linearLayoutAC = (LinearLayout)findViewById(R.id.linearLayout);
+
+                    casillaDinamica = new EditText(this);
+                    casillaDinamica.setId(idD);
+                    casillaDinamica.setHint(nombreParametro);
+
+                    todosDinamicos.add(casillaDinamica);
+
+                    linearLayoutAC.addView(casillaDinamica);
+                }
+
+            }
+
+        } catch (IOException | JSONException e) {
+            Log.d("STATE",e.getMessage());
+            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+
+        }
     }
 
     public void traerListadoDeptos() {
@@ -346,119 +404,131 @@ public class ActividadCampo extends AppCompatActivity  {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void llamoalRest(View view){
-    titulo = findViewById(R.id.textTitulo);
-    descripcion = findViewById(R.id.multiLineDescripcion);
-    cantidad = findViewById(R.id.eTNumberCantidad);
-    fecha=(EditText) findViewById(R.id.etFecha);
-    departamento = findViewById(R.id.spinnerDepto);
-    metodoMuestreo = findViewById(R.id.spinnerMetMuestreo);
-    estacionMuestreo = findViewById(R.id.spinnerEstacionMuestreo);
+
+            titulo = findViewById(R.id.textTitulo);
+            descripcion = findViewById(R.id.multiLineDescripcion);
+            cantidad = findViewById(R.id.eTNumberCantidad);
+            fecha=(EditText) findViewById(R.id.etFecha);
+            departamento = findViewById(R.id.spinnerDepto);
+            metodoMuestreo = findViewById(R.id.spinnerMetMuestreo);
+            estacionMuestreo = findViewById(R.id.spinnerEstacionMuestreo);
 
 
-    //Obtengo los valores ingresados
-    String title = titulo.getText().toString().trim();
-    String description =descripcion.getText().toString().trim();
-    String quantity = cantidad.getText().toString().trim() == null ? "0" : cantidad.getText().toString().trim();
-    String date = fecha.getText().toString();
+            //Obtengo los valores ingresados
+            String title = titulo.getText().toString().trim();
+            String description =descripcion.getText().toString().trim();
+            String quantity = cantidad.getText().toString().trim() == null ? "0" : cantidad.getText().toString().trim();
+            String date = fecha.getText().toString();
 
 
-        //DepartamentoDTO depa = new DepartamentoDTO(idDepartamentoSeleccionado,"");
-   // MetodoMuestreoDTO muestreo = new MetodoMuestreoDTO(idMetodoMuestreoSeleccionado,"");
-   // EstacionMuestreoDTO estam = new EstacionMuestreoDTO(idEstacionMuestreoSeleccionado,"");
-
-    Bundle extras = getIntent().getExtras();
-    Integer id = extras.getInt("idFormulario");
+            Bundle extras = getIntent().getExtras();
+            Integer id = extras.getInt("idFormulario");
 
 
-    //instancio objeto Java
 
-    ActividadCampoDTO act = new ActividadCampoDTO();
-        act.setCantidad(quantity);
-        act.setNombre(title);
-        act.setIdmetMuestreo(Long.valueOf(idMetodoMuestreoSeleccionado));
-        act.setIdestacionMuestreo(Long.valueOf(idEstacionMuestreoSeleccionado));
-        act.setIddepartamento(Long.valueOf(idDepartamentoSeleccionado));
-        act.setIdformulario(Long.valueOf(id));
-        act.setDescripcion(description);
-        act.setFecha(date);
+            //instancio objeto Java
 
-    //Convierto objeto Java a JSON
-    Gson gson = new GsonBuilder()
-            .excludeFieldsWithoutExposeAnnotation()
-            .create();
+            ActividadCampoDTO act = new ActividadCampoDTO();
+                act.setCantidad(quantity);
+                act.setNombre(title);
+                act.setIdmetMuestreo(Long.valueOf(idMetodoMuestreoSeleccionado));
+                act.setIdestacionMuestreo(Long.valueOf(idEstacionMuestreoSeleccionado));
+                act.setIddepartamento(Long.valueOf(idDepartamentoSeleccionado));
+                act.setIdformulario(Long.valueOf(id));
+                act.setDescripcion(description);
+                act.setFecha(date);
 
-    String jsonAct=gson.toJson(act);
-    int SDK_INT = Build.VERSION.SDK_INT;
-    if (SDK_INT > 8)
-    {
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                .permitAll().build();
-        StrictMode.setThreadPolicy(policy);
+                List<RespuestaCasillaDTO> listRC = new ArrayList<>();
 
-        if (!validarCampos() ){
+                for(int i=0; i < todosDinamicos.size(); i++){
 
-    }
-            else {
-        URL url;
-        HttpURLConnection urlConnection = null;
+                    EditText a = todosDinamicos.get(i);
 
-        try {
-            String urlServicio = "http://10.0.2.2:8080/WebIagro2/rest/actividades/crearA";
-            url = new URL(urlServicio);
+                    RespuestaCasillaDTO rc = new RespuestaCasillaDTO(new CasillaDTO((long) a.getId()) , a.getText().toString());
 
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestProperty("content-type", "application/json");
-            urlConnection.setRequestMethod("POST");
-            urlConnection.setReadTimeout(7500);
-            urlConnection.setConnectTimeout(7500);
-            urlConnection.setDoInput(true);
-            urlConnection.setDoOutput(true);
+                    listRC.add(rc);
 
-            OutputStream os = urlConnection.getOutputStream();
+                }
 
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
-            writer.write(jsonAct);
-            writer.flush();
-            writer.close();
-            os.close();
+                act.setRespuestas(listRC);
 
-            int respuesta=urlConnection.getResponseCode();
-            if(respuesta==HttpURLConnection.HTTP_OK){
-                //Obtengo valores devueltos por Rest WS
-                BufferedReader br=new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                String jsonResult=br.readLine();
+            //Convierto objeto Java a JSON
+            Gson gson = new GsonBuilder()
+                    .excludeFieldsWithoutExposeAnnotation()
+                    .create();
 
-                JsonElement jsonElement = new JsonParser().parse(jsonResult);
-                JsonObject jsonObject = jsonElement.getAsJsonObject();
+            String jsonAct=gson.toJson(act);
+            int SDK_INT = Build.VERSION.SDK_INT;
+            if (SDK_INT > 8)
+            {
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                        .permitAll().build();
+                StrictMode.setThreadPolicy(policy);
 
-                descripcion.setText("");
-                titulo.setText("");
-                cantidad.setText("");
+                if (!validarCampos() ){
 
-                boolean error = jsonObject.get("error").getAsBoolean();
-                String mensaje = jsonObject.get("mensaje").toString();
+            }
+                    else {
+                URL url;
+                HttpURLConnection urlConnection = null;
 
-                if(!error){
+                try {
+                    String urlServicio = "http://10.0.2.2:8080/WebIagro2/rest/actividades/crearA";
+                    url = new URL(urlServicio);
 
-                    Toast.makeText(getApplicationContext(), mensaje, Toast.LENGTH_LONG).show();
-                }else{
-                    Toast.makeText(getApplicationContext(), mensaje, Toast.LENGTH_LONG).show();
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setRequestProperty("content-type", "application/json");
+                    urlConnection.setRequestMethod("POST");
+                    urlConnection.setReadTimeout(7500);
+                    urlConnection.setConnectTimeout(7500);
+                    urlConnection.setDoInput(true);
+                    urlConnection.setDoOutput(true);
+
+                    OutputStream os = urlConnection.getOutputStream();
+
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
+                    writer.write(jsonAct);
+                    writer.flush();
+                    writer.close();
+                    os.close();
+
+                    int respuesta=urlConnection.getResponseCode();
+                    if(respuesta==HttpURLConnection.HTTP_OK){
+                        //Obtengo valores devueltos por Rest WS
+                        BufferedReader br=new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                        String jsonResult=br.readLine();
+
+                        JsonElement jsonElement = new JsonParser().parse(jsonResult);
+                        JsonObject jsonObject = jsonElement.getAsJsonObject();
+
+                        descripcion.setText("");
+                        titulo.setText("");
+                        cantidad.setText("");
+
+                        boolean error = jsonObject.get("error").getAsBoolean();
+                        String mensaje = jsonObject.get("mensaje").toString();
+
+                        if(!error){
+
+                            Toast.makeText(getApplicationContext(), mensaje, Toast.LENGTH_LONG).show();
+                        }else{
+                            Toast.makeText(getApplicationContext(), mensaje, Toast.LENGTH_LONG).show();
+                        }
+
+                    }
+                    else{
+                        Toast.makeText(getApplicationContext(), "Hubo algun error", Toast.LENGTH_LONG).show();
+                    }
+
+                } catch (IOException eio) {
+                    Toast.makeText(getApplicationContext(), "CONNECT: No se puede conectar al servidor", Toast.LENGTH_LONG).show();
+                    eio.printStackTrace();
                 }
 
             }
-            else{
-                Toast.makeText(getApplicationContext(), "Hubo algun error", Toast.LENGTH_LONG).show();
-            }
 
-        } catch (IOException eio) {
-            Toast.makeText(getApplicationContext(), "CONNECT: No se puede conectar al servidor", Toast.LENGTH_LONG).show();
-            eio.printStackTrace();
         }
-
     }
-
-}
-}
     public void btnVolveraForm(View v) {
         Intent intent = new Intent(ActividadCampo.this, Formularios.class);
         startActivity(intent);
