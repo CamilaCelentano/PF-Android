@@ -23,6 +23,8 @@ public class FormularioDTO {
     public String nombre;
     @Expose
     public String resumen;
+    @Expose
+    public String casillas;
 
     public String getNombre() {
         return nombre;
@@ -35,6 +37,14 @@ public class FormularioDTO {
     }
     public void setResumen(String resumen) {
         this.resumen = resumen;
+    }
+
+    public String getCasillas() {
+        return casillas;
+    }
+
+    public void setCasillas(String casillas) {
+        this.casillas = casillas;
     }
 
     public FormularioDTO() {

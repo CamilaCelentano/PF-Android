@@ -33,6 +33,7 @@
         app:layout_constraintVertical_bias="1.0" />
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="408dp"
         android:layout_height="680dp"
         android:orientation="vertical"
@@ -55,8 +56,7 @@
             android:layout_marginTop="10dp"
             android:ems="10"
             android:hint="Titulo"
-            android:inputType="textPersonName"
-            tools:text="Jeffo" />
+            android:inputType="textPersonName" />
 
         <EditText
             android:id="@+id/multiLineDescripcion"
@@ -68,8 +68,7 @@
             android:gravity="start|top"
             android:hint="Descripcion"
             android:inputType="textMultiLine"
-            android:paddingLeft="10dp"
-            tools:text="Se avivo" />
+            android:paddingLeft="10dp" />
 
         <EditText
             android:id="@+id/eTNumberCantidad"
@@ -79,8 +78,7 @@
             android:layout_marginTop="10dp"
             android:ems="10"
             android:hint="Cantidad"
-            android:inputType="number"
-            tools:text="2" /><![CDATA[
+            android:inputType="number" /><![CDATA[
 
         android:onClick="showDatePickerDialog" />
 
